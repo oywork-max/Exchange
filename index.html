@@ -2,87 +2,182 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>환전 계산기</title>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
-:root{--olive:#9ACD32;}
-*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{background:#f4f7f3;margin:0;padding:10px;}
-.wrap{max-width:430px;margin:auto;}
-.card{background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
-h1{text-align:center;color:#7fb428;font-size:22px;margin:4px 0 12px;}
-.header,.row{display:grid;grid-template-columns:70px 1fr 120px;gap:6px;align-items:center;}
-.header{font-size:12px;color:#666;border-bottom:1px solid #eee;padding-bottom:6px;margin-bottom:6px;}
-.row{margin:6px 0;}
-.amount{text-align:right;font-weight:700;}
-.ctrl{display:flex;gap:4px;align-items:center;}
-.ctrl button{width:32px;height:32px;}
-.ctrl input{flex:1;height:32px;text-align:center;}
-.total{background:var(--olive);color:#fff;border-radius:12px;padding:10px;text-align:center;margin-top:10px;}
-.total div:last-child{font-size:28px;font-weight:700;}
-.actions{display:flex;gap:8px;margin-top:10px;}
-.actions button{flex:1;height:44px;border:none;border-radius:10px;font-weight:700;}
-.save{background:var(--olive);color:#fff;}
-.home{background:#555;color:#fff;}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;display:none;}
+:root { --olive: #9ACD32; }
+* { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background: #f4f7f3; margin: 0; padding: 12px; display: flex; justify-content: center; }
+.wrap { width: 100%; max-width: 400px; margin: auto; }
+.card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+h1 { text-align: center; color: #7fb428; font-size: 22px; margin: 4px 0 12px; }
+#stamp { font-size: 11px; color: #888; text-align: right; min-height: 16px; margin-bottom: 4px; }
+
+/* 그리드 비율 최적화: 모바일에서 튀어나가지 않도록 조절 */
+.header, .row { display: grid; grid-template-columns: 2fr 2.5fr 3.5fr; gap: 4px; align-items: center; }
+.header { font-size: 12px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 6px; margin-bottom: 6px; text-align: center; }
+.header div:nth-child(2) { text-align: right; padding-right: 5px; }
+.row { margin: 8px 0; }
+.row > div:first-child { font-weight: 500; font-size: 14px; padding-left: 4px; }
+.amount { text-align: right; font-weight: 700; color: #333; font-size: 14px; padding-right: 5px; word-break: break-all; }
+
+/* 컨트롤러 영역 유연하게 변경 */
+.ctrl { display: flex; gap: 2px; align-items: center; justify-content: flex-end; }
+.ctrl button { width: 28px; height: 32px; border: 1px solid #ddd; background: #fafafa; border-radius: 4px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ctrl button:active { background: #eee; }
+.ctrl input { width: 45px; height: 32px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; -moz-appearance: textfield; }
+.ctrl input::-webkit-outer-spin-button, .ctrl input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.total { background: var(--olive); color: #fff; border-radius: 12px; padding: 12px; text-align: center; margin-top: 14px; }
+.total div:first-child { font-size: 13px; opacity: 0.9; margin-bottom: 2px; }
+.total div:last-child { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions button { flex: 1; height: 46px; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: background 0.2s; -webkit-tap-highlight-color: transparent; }
+.save { background: var(--olive); color: #fff; }
+.save:active { background: #88bc23; }
+.home { background: #555; color: #fff; }
+.home:active { background: #444; }
+
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(34,34,34,0.9); color: #fff; padding: 10px 20px; border-radius: 24px; display: none; z-index: 9999; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); white-space: nowrap; }
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="card" id="captureArea">
-<h1>환전 계산기</h1>
-<div id="stamp" style="font-size:11px;color:#666;text-align:right"></div>
-<div class="header"><div>권종</div><div>금액</div><div>수량</div></div>
+  <div class="card" id="captureArea">
+    <h1>환전 계산기</h1>
+    <div id="stamp"></div>
+    <div class="header"><div>권종</div><div>금액</div><div>수량</div></div>
 
-<div class="row"><div>1만원</div><div class="amount" id="a10000">0원</div><div class="ctrl"><button onclick="chg('m10000',-1)">-</button><input id="m10000" type="number" value="0"><button onclick="chg('m10000',1)">+</button></div></div>
-<div class="row"><div>5천원</div><div class="amount" id="a5000">0원</div><div class="ctrl"><button onclick="chg('m5000',-1)">-</button><input id="m5000" type="number" value="0"><button onclick="chg('m5000',1)">+</button></div></div>
-<div class="row"><div>1천원</div><div class="amount" id="a1000">0원</div><div class="ctrl"><button onclick="chg('m1000',-1)">-</button><input id="m1000" type="number" value="0"><button onclick="chg('m1000',1)">+</button></div></div>
-<div class="row"><div>500원</div><div class="amount" id="a500">0원</div><div class="ctrl"><button onclick="chg('m500',-1)">-</button><input id="m500" type="number" value="0"><button onclick="chg('m500',1)">+</button></div></div>
-<div class="row"><div>100원</div><div class="amount" id="a100">0원</div><div class="ctrl"><button onclick="chg('m100',-1)">-</button><input id="m100" type="number" value="0"><button onclick="chg('m100',1)">+</button></div></div>
-<div class="row"><div>50원</div><div class="amount" id="a50">0원</div><div class="ctrl"><button onclick="chg('m50',-1)">-</button><input id="m50" type="number" value="0"><button onclick="chg('m50',1)">+</button></div></div>
-<div class="row"><div>10원</div><div class="amount" id="a10">0원</div><div class="ctrl"><button onclick="chg('m10',-1)">-</button><input id="m10" type="number" value="0"><button onclick="chg('m10',1)">+</button></div></div>
+    <div class="row"><div>1만원</div><div class="amount" id="a10000">0원</div><div class="ctrl"><button onclick="chg('m10000',-1)">-</button><input id="m10000" type="number" value="0" min="0"><button onclick="chg('m10000',1)">+</button></div></div>
+    <div class="row"><div>5천원</div><div class="amount" id="a5000">0원</div><div class="ctrl"><button onclick="chg('m5000',-1)">-</button><input id="m5000" type="number" value="0" min="0"><button onclick="chg('m5000',1)">+</button></div></div>
+    <div class="row"><div>1천원</div><div class="amount" id="a1000">0원</div><div class="ctrl"><button onclick="chg('m1000',-1)">-</button><input id="m1000" type="number" value="0" min="0"><button onclick="chg('m1000',1)">+</button></div></div>
+    <div class="row"><div>500원</div><div class="amount" id="a500">0원</div><div class="ctrl"><button onclick="chg('m500',-1)">-</button><input id="m500" type="number" value="0" min="0"><button onclick="chg('m500',1)">+</button></div></div>
+    <div class="row"><div>100원</div><div class="amount" id="a100">0원</div><div class="ctrl"><button onclick="chg('m100',-1)">-</button><input id="m100" type="number" value="0" min="0"><button onclick="chg('m100',1)">+</button></div></div>
+    <div class="row"><div>50원</div><div class="amount" id="a50">0원</div><div class="ctrl"><button onclick="chg('m50',-1)">-</button><input id="m50" type="number" value="0" min="0"><button onclick="chg('m50',1)">+</button></div></div>
+    <div class="row"><div>10원</div><div class="amount" id="a10">0원</div><div class="ctrl"><button onclick="chg('m10',-1)">-</button><input id="m10" type="number" value="0" min="0"><button onclick="chg('m10',1)">+</button></div></div>
 
-<div class="total"><div>총 환전금액</div><div id="total">0원</div></div>
-</div>
+    <div class="total"><div>총 환전금액</div><div id="total">0원</div></div>
+  </div>
 
-<div class="actions">
-<button class="save" onclick="shareImage()">📸 이미지 저장</button>
-<button class="home" onclick="resetAll()">🏠 홈</button>
-</div>
+  <div class="actions">
+    <button class="save" onclick="shareImage()">📸 이미지 저장</button>
+    <button class="home" onclick="resetAll()">🏠 초기화</button>
+  </div>
 </div>
 <div id="toast">완료</div>
 
 <script>
-const map={m10000:10000,m5000:5000,m1000:10000,m500:20000,m100:5000,m50:2500,m10:500};
-document.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));
-function chg(id,d){const e=document.getElementById(id);e.value=Math.max(0,(+e.value||0)+d);calc();}
-function calc(){
- let total=0;
- Object.keys(map).forEach(id=>{
-   const v=(+document.getElementById(id).value||0)*map[id];
-   document.getElementById("a"+id.replace("m","")).innerText=v.toLocaleString()+"원";
-   total+=v;
- });
- document.getElementById("total").innerText=total.toLocaleString()+"원";
- localStorage.setItem("exchangeData",JSON.stringify([...document.querySelectorAll("input")].map(i=>i.value)));
+// 기존 코드의 계산 단가 오류 수정 (m10000: 10000, m1000: 1000 등 정상 매핑)
+const map = { m10000: 10000, m5000: 5000, m1000: 1000, m500: 500, m100: 100, m50: 50, m10: 10 };
+
+document.querySelectorAll("input").forEach(i => {
+  i.addEventListener("input", () => {
+    if(+i.value < 0) i.value = 0;
+    calc();
+  });
+});
+
+function chg(id, d) {
+  const e = document.getElementById(id);
+  e.value = Math.max(0, (+e.value || 0) + d);
+  calc();
 }
-function resetAll(){document.querySelectorAll("input").forEach(i=>i.value=0);calc();}
-(function(){const d=JSON.parse(localStorage.getItem("exchangeData")||"[]");document.querySelectorAll("input").forEach((i,n)=>{if(d[n]) i.value=d[n]});calc();})();
-async function shareImage(){
- document.getElementById('stamp').innerText=new Date().toLocaleString('ko-KR');
- const canvas=await html2canvas(document.getElementById('captureArea'),{scale:2});
- canvas.toBlob(async b=>{
-   const f=new File([b],'exchange.png',{type:'image/png'});
-   try{
-     if(navigator.canShare&&navigator.canShare({files:[f]})){
-       await navigator.share({files:[f],title:'환전 계산기'});
-     }
-     showToast('공유창이 열렸습니다');
-   }catch(e){}
- });
+
+function calc() {
+  let total = 0;
+  Object.keys(map).forEach(id => {
+    const v = (+document.getElementById(id).value || 0) * map[id];
+    document.getElementById("a" + id.replace("m", "")).innerText = v.toLocaleString() + "원";
+    total += v;
+  });
+  document.getElementById("total").innerText = total.toLocaleString() + "원";
+  localStorage.setItem("exchangeData", JSON.stringify([...document.querySelectorAll("input")].map(i => i.value)));
 }
-function showToast(t){const x=document.getElementById('toast');x.innerText=t;x.style.display='block';setTimeout(()=>x.style.display='none',2000);}
+
+function resetAll() {
+  document.querySelectorAll("input").forEach(i => i.value = 0);
+  calc();
+  showToast('초기화되었습니다');
+}
+
+// 초기 데이터 로드
+(function() {
+  const d = JSON.parse(localStorage.getItem("exchangeData") || "[]");
+  document.querySelectorAll("input").forEach((i, n) => { if (d[n]) i.value = d[n]; });
+  calc();
+})();
+
+// 이미지 저장 및 공유 연동 최적화 (iOS 사파리/크롬 대응)
+async function shareImage() {
+  showToast('이미지 생성 중...');
+  document.getElementById('stamp').innerText = '저장일시: ' + new Date().toLocaleString('ko-KR');
+  
+  try {
+    const target = document.getElementById('captureArea');
+    // html2canvas 모바일 렌더링 최적화 옵션 추가
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+    
+    // Blob 생성
+    canvas.toBlob(async blob => {
+      if (!blob) {
+        showToast('이미지 생성에 실패했습니다.');
+        return;
+      }
+      
+      const file = new File([blob], 'exchange_result.png', { type: 'image/png' });
+      
+      // 1단계: 웹 공유 API 시도 (모바일 사파리, 모바일 크롬 등에서 작동)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: '환전 계산 결과',
+            text: '환전 계산기 결과 이미지입니다.'
+          });
+          showToast('공유창이 열렸습니다.');
+          return; // 성공 시 종료
+        } catch (shareError) {
+          // 사용자가 공유를 취소한 경우가 아니면 Fallback(다운로드)으로 진행
+          if (shareError.name === 'AbortError') {
+            showToast('공유가 취소되었습니다.');
+            return;
+          }
+        }
+      }
+      
+      // 2단계: 공유 API 미지원 혹은 실패 시 직접 다운로드 처리 (크롬 및 일반 브라우저)
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `exchange_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      showToast('이미지가 갤러리/다운로드에 저장되었습니다.');
+      
+    }, 'image/png');
+    
+  } catch (e) {
+    showToast('저장 중 오류가 발생했습니다.');
+    console.error(e);
+  }
+}
+
+function showToast(t) {
+  const x = document.getElementById('toast');
+  x.innerText = t;
+  x.style.display = 'block';
+  // 기존에 돌던 타이머가 있을 수 있으므로 초기화 후 재설정
+  if(window.toastTimeout) clearTimeout(window.toastTimeout);
+  window.toastTimeout = setTimeout(() => x.style.display = 'none', 2500);
+}
 </script>
 </body>
 </html>
