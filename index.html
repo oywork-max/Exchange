@@ -30,6 +30,7 @@ h1{text-align:center;color:#7fb428;font-size:22px;margin:4px 0 12px;}
 .total div:last-child{font-size:26px;font-weight:700;letter-spacing:-0.5px;}
 .card {background: white; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06);}
 .label {font-weight: 700; margin-bottom: 4px; font-size: 14px;}
+#targetAmount {width: 100%; height: 36px; font-size: 18px; padding: 6px 10px; border: 2px solid #cfe58b; border-radius: 10px;}
   
 /* 안내 문구 스타일 */
 .notice{text-align:center;font-size:13px;color:#666;margin-top:12px;font-weight:500;}
@@ -47,13 +48,13 @@ h1{text-align:center;color:#7fb428;font-size:22px;margin:4px 0 12px;}
 <h1>환전 계산기</h1>
 <div class="header"><div>권종</div><div>금액</div><div>수량</div></div>
 
-<div class="row"><div>1만원</div><div class="amount" id="a10000">0원</div><div class="ctrl"><button onclick="chg('m10000',-1)">-</button><input id="m10000" type="number" value="0" min="0"><button onclick="chg('m10000',1)">+</button></div></div>
-<div class="row"><div>5천원</div><div class="amount" id="a5000">0원</div><div class="ctrl"><button onclick="chg('m5000',-1)">-</button><input id="m5000" type="number" value="0" min="0"><button onclick="chg('m5000',1)">+</button></div></div>
-<div class="row"><div>1천원</div><div class="amount" id="a1000">0원</div><div class="ctrl"><button onclick="chg('m1000',-10)">-</button><input id="m1000" type="number" value="0" min="0"><button onclick="chg('m1000',10)">+</button></div></div>
-<div class="row"><div>500원</div><div class="amount" id="a500">0원</div><div class="ctrl"><button onclick="chg('m500',-1)">-</button><input id="m500" type="number" value="0" min="0"><button onclick="chg('m500',1)">+</button></div></div>
-<div class="row"><div>100원</div><div class="amount" id="a100">0원</div><div class="ctrl"><button onclick="chg('m100',-1)">-</button><input id="m100" type="number" value="0" min="0"><button onclick="chg('m100',1)">+</button></div></div>
-<div class="row"><div>50원</div><div class="amount" id="a50">0원</div><div class="ctrl"><button onclick="chg('m50',-1)">-</button><input id="m50" type="number" value="0" min="0"><button onclick="chg('m50',1)">+</button></div></div>
-<div class="row"><div>10원</div><div class="amount" id="a10">0원</div><div class="ctrl"><button onclick="chg('m10',-1)">-</button><input id="m10" type="number" value="0" min="0"><button onclick="chg('m10',1)">+</button></div></div>
+<div class="row"><div>1만원</div><div class="amount" id="a10000">0원</div><div class="ctrl"><button onclick="chg('m10000',-1)">-</button><input id="m10000" type="number" value="0" min="0"><button onclick="chg('m10000',1)">+</button>장</div></div>
+<div class="row"><div>5천원</div><div class="amount" id="a5000">0원</div><div class="ctrl"><button onclick="chg('m5000',-1)">-</button><input id="m5000" type="number" value="0" min="0"><button onclick="chg('m5000',1)">+</button>장</div></div>
+<div class="row"><div>1천원</div><div class="amount" id="a1000">0원</div><div class="ctrl"><button onclick="chg('m1000',-10)">-</button><input id="m1000" type="number" value="0" min="0"><button onclick="chg('m1000',10)">+</button>장</div></div>
+<div class="row"><div>500원</div><div class="amount" id="a500">0원</div><div class="ctrl"><button onclick="chg('m500',-1)">-</button><input id="m500" type="number" value="0" min="0"><button onclick="chg('m500',1)">+</button>묶음</div></div>
+<div class="row"><div>100원</div><div class="amount" id="a100">0원</div><div class="ctrl"><button onclick="chg('m100',-1)">-</button><input id="m100" type="number" value="0" min="0"><button onclick="chg('m100',1)">+</button>묶음</div></div>
+<div class="row"><div>50원</div><div class="amount" id="a50">0원</div><div class="ctrl"><button onclick="chg('m50',-1)">-</button><input id="m50" type="number" value="0" min="0"><button onclick="chg('m50',1)">+</button>묶음</div></div>
+<div class="row"><div>10원</div><div class="amount" id="a10">0원</div><div class="ctrl"><button onclick="chg('m10',-1)">-</button><input id="m10" type="number" value="0" min="0"><button onclick="chg('m10',1)">+</button>묶음</div></div>
 
 <div class="total"><div>총 환전금액</div><div id="total">0원</div></div>
 <div class="notice">📸 캡쳐해서 사용하세요!</div>
