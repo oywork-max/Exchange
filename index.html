@@ -28,6 +28,7 @@ h1{text-align:center;color:#7fb428;font-size:22px;margin:4px 0 12px;}
 .total{background:var(--olive);color:#fff;border-radius:12px;padding:12px;text-align:center;margin-top:14px;}
 .total div:first-child{font-size:13px;opacity:0.9;margin-bottom:2px;}
 .total div:last-child{font-size:26px;font-weight:700;letter-spacing:-0.5px;}
+.card {background: white; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06);}
 
 /* 안내 문구 스타일 */
 .notice{text-align:center;font-size:13px;color:#666;margin-top:12px;font-weight:500;}
@@ -57,6 +58,11 @@ h1{text-align:center;color:#7fb428;font-size:22px;margin:4px 0 12px;}
 <div class="notice">📸 캡쳐해서 사용하세요!</div>
 </div>
 
+<div class="card">
+<div class="label">오늘의 송금액</div>
+<input id="targetAmount" type="number" placeholder="금액 입력">
+</div>
+  
 <div class="actions">
 <button onclick="resetAll()">🏠 초기화</button>
 </div>
